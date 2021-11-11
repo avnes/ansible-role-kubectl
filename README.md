@@ -26,6 +26,12 @@ None
      - { role: avnes.kubectl }
 ```
 
+## For pip compability
+
+```bash
+poetry export --dev --output requirements.txt
+```
+
 ## Test
 
 ```bash
