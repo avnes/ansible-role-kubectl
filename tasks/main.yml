@@ -1,0 +1,52 @@
+---
+- name: Find latest stable version
+  uri:
+    url: https://dl.k8s.io/release/stable.txt
+    return_content: yes
+  register: stable_version
+  when: kubectl_version == "latest"
+
+- name: Set version to download when latest stable version
+  set_fact:
+    kubectl_download_version: "{{ stable_version.content }}"
+  when: kubectl_version == "latest"
+
+- name: Set version to download if using custom version
+  set_fact:
+    kubectl_download_version: "{{ kubectl_version }}"
+  when: kubectl_version != "latest"
+
+- name: Set version to download if using custom version and missing v prefix
+  set_fact:
+    kubectl_download_version: "v{{ kubectl_version }}"
+  when:
+    - kubectl_version != "latest"
+    - "'v' not in kubectl_version"
+
+- name: Set download URL
+  set_fact:
+    kubectl_download_url: "https://dl.k8s.io/release/{{ kubectl_download_version }}/bin/linux/amd64/kubectl"
+
+- name: Create bin directory in users home if necessary for local install
+  ansible.builtin.file:
+    path: "{{ ansible_user_dir }}/bin"
+    state: directory
+    mode: 0755
+  when: not kubectl_for_all_users | bool
+
+- name: Download file for your user only
+  uri:
+    url: "{{ kubectl_download_url }}"
+    dest: "{{ ansible_user_dir }}/bin/kubectl"
+    follow_redirects: all
+    mode: 0755
+  when: not kubectl_for_all_users | bool
+
+- name: Download file for all users to use
+  uri:
+    url: "{{ kubectl_download_url }}"
+    dest: "/usr/local/bin/kubectl"
+    follow_redirects: all
+    mode: 0755
+  when: kubectl_for_all_users | bool
+  become: yes
