@@ -11,6 +11,7 @@ Poetry. Install it from <https://python-poetry.org/docs/>
 ```yaml
 kubectl_version: latest     # It can also be a specifik version like v1.21.4
 kubectl_for_all_users: true # If false it will install in in the users ~/bin directory
+command_shell: bash         # Must be bash or zsh
 ```
 
 ## Dependencies

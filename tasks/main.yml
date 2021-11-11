@@ -27,6 +27,16 @@
   set_fact:
     kubectl_download_url: "https://dl.k8s.io/release/{{ kubectl_download_version }}/bin/linux/amd64/kubectl"
 
+- name: Set download directory if install only for the user
+  set_fact:
+    kubectl_download_dir: "{{ ansible_user_dir }}/bin"
+  when: not kubectl_for_all_users | bool
+
+- name: Set download directory for all users to use
+  set_fact:
+    kubectl_download_dir: "/usr/local/bin"
+  when: kubectl_for_all_users | bool
+
 - name: Create bin directory in users home if necessary for local install
   ansible.builtin.file:
     path: "{{ ansible_user_dir }}/bin"
@@ -34,19 +44,35 @@
     mode: 0755
   when: not kubectl_for_all_users | bool
 
-- name: Download file for your user only
+- name: Download kubectl
   uri:
     url: "{{ kubectl_download_url }}"
-    dest: "{{ ansible_user_dir }}/bin/kubectl"
+    dest: "{{ kubectl_download_dir }}/kubectl"
     follow_redirects: all
+    status_code: [200, 304]
     mode: 0755
-  when: not kubectl_for_all_users | bool
 
-- name: Download file for all users to use
-  uri:
-    url: "{{ kubectl_download_url }}"
-    dest: "/usr/local/bin/kubectl"
-    follow_redirects: all
-    mode: 0755
-  when: kubectl_for_all_users | bool
+- name: Configure autocompletion for the user only
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_user_dir }}/.{{ command_shell | lower }}rc"
+    regexp: '^source <(kubectl completion {{ command_shell | lower }})'
+    line: "source <(kubectl completion {{ command_shell | lower }})"
+  when: not kubectl_for_all_users
+
+- name: Set global profile file for bash
+  set_fact:
+    global_profile_file: /etc/profile
+  when: kubectl_for_all_users | bool and command_shell | lower == "bash"
+
+- name: Set global profile file for zsh
+  set_fact:
+    global_profile_file: /etc/zshenv
+  when: kubectl_for_all_users | bool and command_shell | lower == "zsh"
+
+- name: Configure autocompletion for all users
+  ansible.builtin.lineinfile:
+    path: "{{ global_profile_file }}"
+    regexp: '^source <(kubectl completion {{ command_shell | lower }})'
+    line: "source <(kubectl completion {{ command_shell | lower }})"
+  when: kubectl_for_all_users
   become: yes

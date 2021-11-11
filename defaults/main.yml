@@ -1,3 +1,5 @@
 ---
 kubectl_version: latest
 kubectl_for_all_users: true
+
+command_shell: bash
