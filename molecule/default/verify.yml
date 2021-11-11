@@ -69,6 +69,7 @@
     command: cat "{{ profile_file }}"
     register: cat_reg
     no_log: true
+    changed_when: false
 
   - name: Assert that autocompletion is configured
     assert:
