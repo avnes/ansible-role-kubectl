@@ -20,7 +20,7 @@ jobs:
       - name: molecule
         uses: robertdebock/molecule-action@2.6.3
   release:
-    if: ${{ github.event_name == 'release' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'release' }}
     needs:
       - test
     runs-on: ubuntu-latest
