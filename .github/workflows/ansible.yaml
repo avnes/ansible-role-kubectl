@@ -1,4 +1,4 @@
-name: Ansible test and publish
+name: Ansible workflow
 on:
   push:
     branches: [ main ]
@@ -29,7 +29,7 @@ jobs:
       - test
     runs-on: ubuntu-latest
     steps:
-      - name: galaxy
+      - name: Publish to Ansible Galaxy
         uses: robertdebock/galaxy-action@1.1.0
         with:
           galaxy_api_key: ${{ secrets.GALAXY_API_KEY }}
