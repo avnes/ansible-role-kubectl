@@ -9,7 +9,7 @@ before_install:
  - sudo useradd -d /home/ansible-test-user ansible-test-user
  - sudo mkdir /home/ansible-test-user
  - sudo chown ansible-test-user:ansible-test-user /home/ansible-test-user
- - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+ - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python -
 
 # addons:
 #   apt:
@@ -19,10 +19,10 @@ before_install:
 install:
   - PATH=$HOME/.local/bin:$PATH
   - export PATH
-  - poetry install
+  - $HOME/.local/bin/poetry install
 
 script:
-  - poetry run molecule test
+  - $HOME/.local/bin/poetry run molecule test
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
