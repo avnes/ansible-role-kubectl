@@ -1,5 +1,7 @@
 # ansible-role-kubectl
 
+![Ansible](https://github.com/avnes/ansible-role-kubectl/actions/workflows/ansible.yaml/badge.svg)
+
 Ansible role for installing kubectl.
 
 ## Requirements
